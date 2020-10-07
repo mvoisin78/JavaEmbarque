@@ -36,14 +36,14 @@ public class ServerActivity extends AppCompatActivity {
     private Button btn_download;
     BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
     String url;
-    ProgressBar mProgressBar;
+    //ProgressBar mProgressBar;
     EditText texte;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         texte = (EditText) findViewById(R.id.uri);
         final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
@@ -55,12 +55,12 @@ public class ServerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 btn_download.setEnabled(false);
                 url = texte.getText().toString();
-                mProgressBar.setProgress(0);
-                mProgressBar.setMax(100);
+                //mProgressBar.setProgress(0);
+                //mProgressBar.setMax(100);
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 File file = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + "My_Video", "video.mp4");
                 request.setDestinationUri(Uri.fromFile(file));
-                new Thread(new Runnable() {
+                /*new Thread(new Runnable() {
 
                     @Override
                     public void run() {
@@ -94,7 +94,7 @@ public class ServerActivity extends AppCompatActivity {
                         }
 
                     }
-                }).start();
+                }).start();*/
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 Long reference = manager.enqueue(request);
 
