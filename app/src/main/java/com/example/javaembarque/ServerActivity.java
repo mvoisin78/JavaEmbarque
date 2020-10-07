@@ -1,9 +1,14 @@
 package com.example.javaembarque;
 
+import android.Manifest;
+import android.app.DownloadManager;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,72 +50,21 @@ public class ServerActivity extends AppCompatActivity {
         Toast.makeText(this, toastText,Toast.LENGTH_LONG).show();*/
 
         btn_download = (Button) findViewById(R.id.download_btn);
-        videoView=(VideoView)findViewById(R.id.videoView);
-        Uri vidurl=Uri.parse("https://ia800201.us.archive.org/22/items/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4");
-        videoView.setVideoURI(vidurl);
-        videoView.start();
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         btn_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                download();
+                String url = "https://ia800201.us.archive.org/22/items/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet.mp4";
+                // get download service and enqueue file
+                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                Long reference = manager.enqueue(request);
 
             }
         });
     }
 
-    private void download() {
-        Downback DB = new Downback();
-        DB.execute("");
-
-    }
-
-
-    private class Downback extends AsyncTask<String, String, String> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            final String vidurl = "https://ia800201.us.archive.org/22/items/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
-            downloadfile(vidurl);
-            return null;
-
-        }
-
-
-    }
-
-    private void downloadfile(String vidurl) {
-
-        SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
-        String date = sd.format(new Date());
-        String name = "video" + date + ".mp4";
-
-        try {
-            String rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    + File.separator + "My_Video";
-            System.out.println("it's ok");
-            File rootFile = new File(rootDir);
-            rootFile.mkdir();
-            URL url = new URL(vidurl);
-            HttpURLConnection c = (HttpURLConnection) url.openConnection();
-            c.setRequestMethod("GET");
-            c.setDoOutput(true);
-            c.connect();
-            FileOutputStream f = new FileOutputStream(new File(rootFile,
-                    name));
-            InputStream in = c.getInputStream();
-            byte[] buffer = new byte[1024];
-            int len1 = 0;
-            while ((len1 = in.read(buffer)) > 0) {
-                f.write(buffer, 0, len1);
-            }
-            f.close();
-        } catch (IOException e) {
-            Log.d("Error....", e.toString());
-        }
-    }
 }
