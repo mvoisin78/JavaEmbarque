@@ -37,11 +37,11 @@
             android:layout_height="match_parent" >
 
             <Button
-                android:id="@+id/client"
+                android:id="@+id/bluetooth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lunch client"
-                android:onClick="goToVideo"/>/>
+                android:onClick="goToB"/>
         </TableRow>
 
         <TableRow

@@ -22,4 +22,9 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, VideoPlayer.class);
         startActivity(intent);
     }
+
+    public void goToB(View view) {
+        Intent intent = new Intent(this, Bluetooth.class);
+        startActivity(intent);
+    }
 }

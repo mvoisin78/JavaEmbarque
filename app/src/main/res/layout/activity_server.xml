@@ -26,10 +26,25 @@
             android:id="@+id/download_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/videoView"
+            android:layout_below="@+id/uri"
             android:layout_centerHorizontal="true"
             android:enabled="true"
             android:text="download video" />
+
+        <Button
+            android:id="@+id/start_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/download_btn"
+            android:layout_centerHorizontal="true"
+            android:enabled="true"
+            android:text="Start Server" />
+
+        <TextView
+            android:id="@+id/serv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10" />
 
         <!--<ProgressBar
             android:id="@+id/progressBar"
