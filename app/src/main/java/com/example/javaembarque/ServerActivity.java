@@ -47,39 +47,26 @@ public class ServerActivity extends AppCompatActivity {
         texte = (EditText) findViewById(R.id.uri);
         final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
-
-       /* String toastText;
-        if(bluetooth.isEnabled()){
-            String address=bluetooth.getAddress();
-            String name=bluetooth.getName();
-            toastText=name+" : "+address;
-        }
-        else
-            toastText="Bluetooth is not enabled";
-        Toast.makeText(this, toastText,Toast.LENGTH_LONG).show();*/
-
         btn_download = (Button) findViewById(R.id.download_btn);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         btn_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                btn_download.setEnabled(false);
                 url = texte.getText().toString();
                 mProgressBar.setProgress(0);
                 mProgressBar.setMax(100);
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                File file = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + "My_Video", "video.mp4");
+                request.setDestinationUri(Uri.fromFile(file));
                 new Thread(new Runnable() {
 
                     @Override
                     public void run() {
-
                         boolean downloading = true;
-
                         while (downloading) {
-
                             DownloadManager.Query q = new DownloadManager.Query();
-
                             Cursor cursor = manager.query(q);
                             cursor.moveToFirst();
                             int bytes_downloaded = cursor.getInt(cursor
@@ -97,6 +84,9 @@ public class ServerActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     mProgressBar.setProgress((int) dl_progress);
+                                    if(dl_progress == 100){
+                                        btn_download.setEnabled(true);
+                                    }
                                 }
                             });
 

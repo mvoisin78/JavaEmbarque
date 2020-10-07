@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="https://ia800201.us.archive.org/22/items/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet.mp4" />
+            android:text="https://ia800201.us.archive.org/22/items/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4" />
 
         <Button
             android:id="@+id/download_btn"
@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/videoView"
             android:layout_centerHorizontal="true"
+            android:enabled="true"
             android:text="download video" />
 
         <ProgressBar
