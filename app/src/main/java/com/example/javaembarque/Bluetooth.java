@@ -91,7 +91,12 @@ public class Bluetooth extends AppCompatActivity {
                     BluetoothSocket socket = devices.get(position).createInsecureRfcommSocketToServiceRecord(UUID.fromString("c89fe610-2273-4d4f-bb49-08430113de66"));
                     socket.connect();
                     Intent intent = new Intent(getApplicationContext(),VideoPlayer.class);
-                    refresh.setText("Connecté");
+                    if(socket.isConnected()) {
+                        refresh.setText("Connecté");
+                    }
+                    else{
+                        refresh.setText("Failed");
+                    }
                     //startActivity(intent);
                 } catch (IOException e) {
                     e.printStackTrace();

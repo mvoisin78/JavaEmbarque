@@ -16,9 +16,30 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/bluetooth"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="100dp"
         android:clickable="true"
         android:textAlignment="center"
         android:text="Refresh"
         app:srcCompat="@android:drawable/stat_notify_sync" />
+
+    <Button
+        android:id="@+id/download_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/bluetooth"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:clickable="true"
+        android:textAlignment="center"
+        android:text="Download"
+        app:srcCompat="@android:drawable/stat_notify_sync" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/bluetooth"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp" />
 </RelativeLayout>
