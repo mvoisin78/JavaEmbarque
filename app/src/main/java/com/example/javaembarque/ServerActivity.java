@@ -25,8 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class ServerActivity extends AppCompatActivity {
@@ -39,6 +44,7 @@ public class ServerActivity extends AppCompatActivity {
     //ProgressBar mProgressBar;
     EditText texte;
     TextView text;
+    SendReceive sendReceive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,34 +158,6 @@ public class ServerActivity extends AppCompatActivity {
             }
         });
     }
-    /*public void AcceptThread() {
-        BluetoothServerSocket tmp = null;
-        try {
-            tmp = bluetooth.listenUsingRfcommWithServiceRecord("MYYAPP", UUID.fromString("c89fe610-2273-4d4f-bb49-08430113de66"));
-
-        } catch (IOException e) { }
-        serverSocket = tmp;
-    }
-    public void run() {
-        BluetoothSocket socket = null;
-        while (true) {
-            try {
-                socket = serverSocket.accept();
-                text.setText("listening");
-            } catch (IOException e) {
-                break;
-            }
-            if (socket != null) {
-                text.setText("done");
-                try {
-                    serverSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-    }*/
 
     @Override
     protected void onDestroy() {
@@ -197,8 +175,16 @@ public class ServerActivity extends AppCompatActivity {
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
                 case 1: text.setText("Connected");
+
                     break;
                 case 2: text.setText("Connection failed");
+                    break;
+                case 5:
+                    byte[] readBuff= (byte[]) msg.obj;
+                    String tempMsg=new String(readBuff,0,msg.arg1);
+                    String retour = "Retour";
+                    sendReceive.write(retour.getBytes());
+                    text.setText(tempMsg);
                     break;
             }
 
@@ -231,6 +217,8 @@ public class ServerActivity extends AppCompatActivity {
                     Message message = Message.obtain();
                     message.what = 1;
                     handler.sendMessage(message);
+                    sendReceive = new SendReceive(socket);
+                    sendReceive.start();
                 } catch (IOException e) {
                     Log.e("TAG", "Socket's accept() method failed", e);
                     Message message = Message.obtain();
@@ -259,6 +247,76 @@ public class ServerActivity extends AppCompatActivity {
                 mmServerSocket.close();
             } catch (IOException e) {
                 Log.e("TAG", "Could not close the connect socket", e);
+            }
+        }
+    }
+
+    private class SendReceive extends Thread{
+        private final BluetoothSocket bluetoothSocket;
+        private final InputStream inputStream;
+        private OutputStream outputStream;
+        public SendReceive(BluetoothSocket socket){
+            bluetoothSocket=socket;
+            InputStream tempIn =null;
+            OutputStream tempOut =null;
+
+
+            try {
+                tempIn=bluetoothSocket.getInputStream();
+                tempOut=bluetoothSocket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            inputStream=tempIn;
+            outputStream=tempOut;
+        }
+
+        public void run(){
+            byte[] buffer=new byte[1024];
+            int bytes;
+
+            while(true){
+                try {
+                    bytes = inputStream.read(buffer);
+                    handler.obtainMessage(5,bytes,-1,buffer).sendToTarget();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        public void write(byte[] bytes){//(BluetoothSocket socket){
+            /*try {
+                outputStream = bluetoothSocket.getOutputStream();
+            } catch (IOException e) { }
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    + File.separator + "My_Video/video.mp4");
+            int size = (int) file.length();
+            byte[] bytes = new byte[size];
+            try {
+                BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+                buf.read(bytes, 0, bytes.length);
+                buf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                outputStream.write(bytes);
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                outputStream.write("EOF".getBytes(StandardCharsets.UTF_8));
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+            try {
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

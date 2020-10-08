@@ -11,18 +11,25 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.FileUtils;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -31,7 +38,9 @@ public class Bluetooth extends AppCompatActivity {
 
     ListView scrollView;
     BluetoothAdapter adapter;
-    Button refresh;
+    Button refresh, download;
+    TextView text;
+    SendReceive sendReceive;
 
     private ArrayList<String> deviceNames;
     private ArrayAdapter<String> arrayAdapter;
@@ -43,9 +52,12 @@ public class Bluetooth extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
+        text = findViewById(R.id.test);
         scrollView = findViewById(R.id.bluetooth);
         adapter = BluetoothAdapter.getDefaultAdapter();
         refresh = findViewById(R.id.refreshButton);
+        download = findViewById(R.id.download_btn);
+        download.setEnabled(false);
 
         deviceNames = new ArrayList<>();
         arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, deviceNames);
@@ -63,6 +75,15 @@ public class Bluetooth extends AppCompatActivity {
             }
             startActivityForResult(new Intent(actionRequestEnable), 0);
         }
+
+        download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String txt= "test com";
+                sendReceive.write(txt.getBytes());
+            }
+        });
+
 
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +114,10 @@ public class Bluetooth extends AppCompatActivity {
                     Intent intent = new Intent(getApplicationContext(),VideoPlayer.class);
                     if(socket.isConnected()) {
                         refresh.setText("Connecté");
+                        refresh.setEnabled(false);
+                        download.setEnabled(true);
+                        sendReceive = new SendReceive(socket);
+                        sendReceive.start();
                     }
                     else{
                         refresh.setText("Failed");
@@ -177,4 +202,66 @@ public class Bluetooth extends AppCompatActivity {
             }
         }
     };
+
+    Handler handler=new Handler(new Handler.Callback(){
+
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case 1: text.setText("Connected");
+                    break;
+                case 2: text.setText("Connection failed");
+                case 5:
+                    text.setText("Data receive");
+                    break;
+            }
+
+            return true;
+        }
+    });
+
+    private class SendReceive extends Thread{
+        private final BluetoothSocket bluetoothSocket;
+        private final InputStream inputStream;
+        private final OutputStream outputStream;
+        public SendReceive(BluetoothSocket socket){
+            bluetoothSocket=socket;
+            InputStream tempIn =null;
+            OutputStream tempOut =null;
+
+
+            try {
+                tempIn=bluetoothSocket.getInputStream();
+                tempOut=bluetoothSocket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            inputStream=tempIn;
+            outputStream=tempOut;
+        }
+
+        public void run(){
+            byte[] buffer=new byte[1024];
+            int bytes;
+
+            while(true){
+                try {
+                    bytes = inputStream.read(buffer);
+                    handler.obtainMessage(5,bytes,-1,buffer).sendToTarget();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        public void write(byte[] bytes){
+            try {
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
