@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SyncStatusObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,6 +41,7 @@ public class ServerActivity extends AppCompatActivity {
     private Button btn_download;
     BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
     BluetoothServerSocket serverSocket;
+    BluetoothSocket socket;
     String url;
     //ProgressBar mProgressBar;
     EditText texte;
@@ -163,7 +165,9 @@ public class ServerActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         try {
-            serverSocket.close();
+            if(socket != null) {
+                serverSocket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -182,9 +186,7 @@ public class ServerActivity extends AppCompatActivity {
                 case 5:
                     byte[] readBuff= (byte[]) msg.obj;
                     String tempMsg=new String(readBuff,0,msg.arg1);
-                    String retour = "Retour";
-                    sendReceive.write(retour.getBytes());
-                    text.setText(tempMsg);
+                    sendReceive.write(socket);
                     break;
             }
 
@@ -209,7 +211,7 @@ public class ServerActivity extends AppCompatActivity {
         }
 
         public void run() {
-            BluetoothSocket socket = null;
+            socket = null;
             // Keep listening until exception occurs or a socket is returned.
             while (true) {
                 try {
@@ -227,28 +229,9 @@ public class ServerActivity extends AppCompatActivity {
                     break;
                 }
 
-                if (socket != null) {
-                    // A connection was accepted. Perform work associated with
-                    // the connection in a separate thread.
-                    //manageMyConnectedSocket(socket);
-                    try {
-                        mmServerSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
             }
         }
-
-        // Closes the connect socket and causes the thread to finish.
-        public void cancel() {
-            try {
-                mmServerSocket.close();
-            } catch (IOException e) {
-                Log.e("TAG", "Could not close the connect socket", e);
-            }
-        }
+        
     }
 
     private class SendReceive extends Thread{
@@ -286,8 +269,8 @@ public class ServerActivity extends AppCompatActivity {
 
             }
         }
-        public void write(byte[] bytes){//(BluetoothSocket socket){
-            /*try {
+        public void write(BluetoothSocket socket){
+            try {
                 outputStream = bluetoothSocket.getOutputStream();
             } catch (IOException e) { }
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -310,11 +293,6 @@ public class ServerActivity extends AppCompatActivity {
                 }
                 outputStream.write("EOF".getBytes(StandardCharsets.UTF_8));
                 outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-            try {
-                outputStream.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
             }

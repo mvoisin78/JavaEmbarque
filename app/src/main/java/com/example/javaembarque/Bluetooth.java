@@ -212,7 +212,9 @@ public class Bluetooth extends AppCompatActivity {
                     break;
                 case 2: text.setText("Connection failed");
                 case 5:
-                    text.setText("Data receive");
+                    byte[] readBuff= (byte[]) msg.obj;
+                    String tempMsg=new String(readBuff,0,msg.arg1);
+                    System.out.println(tempMsg);
                     break;
             }
 
