@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +24,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,6 +45,8 @@ public class Bluetooth extends AppCompatActivity {
     Button refresh, download;
     TextView text;
     SendReceive sendReceive;
+    private FileOutputStream fos;
+    File file;
 
     private ArrayList<String> deviceNames;
     private ArrayAdapter<String> arrayAdapter;
@@ -66,6 +72,13 @@ public class Bluetooth extends AppCompatActivity {
         String enableRequest = BluetoothAdapter.ACTION_REQUEST_ENABLE;
         startActivityForResult(new Intent(enableRequest), 0);
 
+        File file = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + "My_Video", "video.mp4");
+        try {
+            fos = new FileOutputStream(file,true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         if (!adapter.isEnabled()) {
             String actionStateChanged = BluetoothAdapter.ACTION_STATE_CHANGED;
             String actionRequestEnable = BluetoothAdapter.ACTION_REQUEST_ENABLE;
@@ -81,6 +94,7 @@ public class Bluetooth extends AppCompatActivity {
             public void onClick(View view) {
                 String txt= "test com";
                 sendReceive.write(txt.getBytes());
+                download.setEnabled(false);
             }
         });
 
@@ -212,9 +226,20 @@ public class Bluetooth extends AppCompatActivity {
                     break;
                 case 2: text.setText("Connection failed");
                 case 5:
-                    byte[] readBuff= (byte[]) msg.obj;
-                    String tempMsg=new String(readBuff,0,msg.arg1);
-                    System.out.println(tempMsg);
+                    byte[] text = (byte[]) msg.obj;
+                    String str = new String(text);
+                    if(!str.equals("EOF")){
+                        try {
+                            fos.write(text);
+                            System.out.println(str);
+                        }
+                        catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    else{
+                        download.setEnabled(true);
+                    }
                     break;
             }
 

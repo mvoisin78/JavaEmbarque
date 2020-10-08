@@ -58,8 +58,8 @@
                 android:id="@+id/activity2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Second Activity"
-                android:onClick="goToMain2"/>
+                android:text="Video"
+                android:onClick="goToVideo"/>
         </TableRow>
     </TableLayout>
 

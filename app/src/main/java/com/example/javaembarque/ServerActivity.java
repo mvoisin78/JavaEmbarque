@@ -295,7 +295,7 @@ public class ServerActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //outputStream.write("EOF".getBytes(StandardCharsets.UTF_8));
+                outputStream.write("EOF".getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 e.printStackTrace();
             }
