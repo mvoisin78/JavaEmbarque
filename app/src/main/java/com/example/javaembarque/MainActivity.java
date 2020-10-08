@@ -27,4 +27,9 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, Bluetooth.class);
         startActivity(intent);
     }
+
+    public void goToMain2(View view) {
+        Intent intent = new Intent(this, MainActivity2.class);
+        startActivity(intent);
+    }
 }
