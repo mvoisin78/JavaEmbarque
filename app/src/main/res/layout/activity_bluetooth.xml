@@ -10,7 +10,8 @@
         android:layout_alignBottom="@id/bluetooth"
         android:ems="10"
         android:layout_marginBottom="15dp"
-        android:text="Bonjour" />
+        android:text="Nothing Download"
+        android:textAlignment="center"/>
 
     <ListView
         android:id="@+id/bluetooth"
