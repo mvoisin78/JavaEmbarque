@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -231,7 +232,7 @@ public class ServerActivity extends AppCompatActivity {
 
             }
         }
-        
+
     }
 
     private class SendReceive extends Thread{
@@ -276,6 +277,9 @@ public class ServerActivity extends AppCompatActivity {
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                     + File.separator + "My_Video/video.mp4");
             int size = (int) file.length();
+            ByteBuffer bb = ByteBuffer.allocate(4);
+            bb.putInt(size);
+            write(bb.array());
             byte[] bytes = new byte[size];
             try {
                 BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
@@ -291,11 +295,18 @@ public class ServerActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                outputStream.write("EOF".getBytes(StandardCharsets.UTF_8));
-                outputStream.close();
+                //outputStream.write("EOF".getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        public void write(byte[] bytes){
+            try {
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }
